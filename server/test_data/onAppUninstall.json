@@ -1,0 +1,9 @@
+{
+  "iparams": {
+    "trelloBoardId": "< Enter Your Board Id>",
+    "trelloApiKey": "< Enter Your trello api key>",
+    "trelloToken": "< Enter Your Token>",
+    "freshdeskDomain": "https://<Enter Your subdomain>.freshdesk.com",
+    "freshdeskApiKey": "< Enter Your API key>"
+  }
+}

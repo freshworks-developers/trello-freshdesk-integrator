@@ -1,0 +1,91 @@
+{
+  "iparams": {
+    "trelloBoardId": "< Enter Your Board Id>",
+    "trelloApiKey": "< Enter Your trello api key>",
+    "trelloToken": "< Enter Your Token>",
+    "freshdeskDomain": "https://<Enter Your subdomain>.freshdesk.com",
+    "freshdeskApiKey": "< Enter Your API key>"
+  },
+  "data": {
+    "action": {
+      "id": "61cc19f2132a574b890fb637",
+      "idMemberCreator": "61adb2a36128a81fd960726e",
+      "data": {
+        "text": "hi",
+        "textData": {
+          "emoji": {}
+        },
+        "card": {
+          "id": "61d02330bf3c9d8a26705409",
+          "name": "How can I get a refund for my order?",
+          "idShort": 113,
+          "shortLink": "P69TJMaR"
+        },
+        "board": {
+          "id": "61b2445b8d2b866fd283b76d",
+          "name": "Sample App Board",
+          "shortLink": "S7UU82y8"
+        },
+        "list": {
+          "id": "61b2445b8d2b866fd283b770",
+          "name": "To Do"
+        }
+      },
+      "type": "commentCard",
+      "date": "2021-12-28T09:10:33.381Z",
+      "appCreator": null,
+      "limits": {
+        "reactions": {
+          "perAction": {
+            "status": "ok",
+            "disableAt": 900,
+            "warnAt": 720
+          },
+          "uniquePerAction": {
+            "status": "ok",
+            "disableAt": 17,
+            "warnAt": 14
+          }
+        }
+      },
+      "display": {
+        "translationKey": "action_comment_on_card",
+        "entities": {
+          "contextOn": {
+            "type": "translatable",
+            "translationKey": "action_on",
+            "hideIfContext": true,
+            "idContext": "61cad1d09461565834873edd"
+          },
+          "card": {
+            "type": "card",
+            "hideIfContext": true,
+            "id": "61cad1d09461565834873edd",
+            "shortLink": "cdxmKBIB",
+            "text": "How can I get a refund for my order?"
+          },
+          "comment": {
+            "type": "comment",
+            "text": "hi"
+          },
+          "memberCreator": {
+            "type": "member",
+            "id": "61adb2a36128a81fd960726e",
+            "username": "ABC",
+            "text": "ABC"
+          }
+        }
+      },
+      "memberCreator": {
+        "id": "61adb2a36128a81fd960726e",
+        "activityBlocked": false,
+        "fullName": "ABC",
+        "idMemberReferrer": null,
+        "initials": "Z",
+        "nonPublic": {},
+        "nonPublicAvailable": true,
+        "username": "ABC"
+      }
+    }
+  }
+}
