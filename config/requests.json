@@ -1,0 +1,142 @@
+{
+  "getListSMI": {
+    "schema": {
+      "protocol": "https",
+      "method": "GET",
+      "host": "api.trello.com",
+      "path": "/1/boards/<%= iparam.trelloBoardId %>/lists",
+      "query": {
+        "key": "<%= iparam.trelloApiKey %>",
+        "token": "<%= iparam.trelloToken %>"
+      }
+    }
+  },
+  "getMemberSMI": {
+    "schema": {
+      "protocol": "https",
+      "method": "GET",
+      "host": "api.trello.com",
+      "path": "/1/boards/<%= iparam.trelloBoardId %>/members",
+      "query": {
+        "key": "<%= iparam.trelloApiKey %>",
+        "token": "<%= iparam.trelloToken %>"
+      }
+    }
+  },
+  "fetchCardSMI": {
+    "schema": {
+      "protocol": "https",
+      "method": "GET",
+      "host": "api.trello.com",
+      "path": "/1/cards/<%= context.cardID %>",
+      "query": {
+        "key": "<%= iparam.trelloApiKey %>",
+        "token": "<%= iparam.trelloToken %>",
+        "members": "true",
+        "list": "true",
+        "board": "true"
+      }
+    }
+  },
+  "postCardSMI": {
+    "schema": {
+      "protocol": "https",
+      "method": "POST",
+      "host": "api.trello.com",
+      "path": "/1/cards",
+      "query": {
+        "key": "<%= iparam.trelloApiKey %>",
+        "token": "<%= iparam.trelloToken %>",
+        "idList": "<%= context.idList %>",
+        "idMembers": "<%= context.idMembers %>",
+        "name": "<%= context.name %>",
+        "desc": "<%= context.desc %>",
+        "due": "<%= context.due %>"
+      }
+    }
+  },
+  "postLabelSMI": {
+    "schema": {
+      "protocol": "https",
+      "method": "POST",
+      "host": "api.trello.com",
+      "path": "/1/cards/<%= context.cardId %>/labels",
+      "query": {
+        "key": "<%= iparam.trelloApiKey %>",
+        "token": "<%= iparam.trelloToken %>",
+        "name": "<%= context.name %>",
+        "color": "<%= context.color %>"
+      }
+    }
+  },
+  "deleteCardSMI": {
+    "schema": {
+      "protocol": "https",
+      "method": "DELETE",
+      "host": "api.trello.com",
+      "path": "/1/cards/<%= context.cardID %>",
+      "query": {
+        "key": "<%= iparam.trelloApiKey %>",
+        "token": "<%= iparam.trelloToken %>"
+      }
+    }
+  },
+  "createWebhook": {
+    "schema": {
+      "protocol": "https",
+      "method": "POST",
+      "host": "api.trello.com",
+      "path": "/1/tokens/<%= iparam.trelloToken %>/webhooks/",
+      "query": {
+        "description": "<%= context.desc %>",
+        "callbackURL": "<%= context.targetUrl %>",
+        "idModel": "<%= iparam.trelloBoardId %>",
+        "key": "<%= iparam.trelloApiKey %>"
+      }
+    }
+  },
+  "deleteWebhook": {
+    "schema": {
+      "protocol": "https",
+      "method": "DELETE",
+      "host": "api.trello.com",
+      "path": "/1/tokens/<%= iparam.trelloToken %>/webhooks/<%= context.webhookId %>",
+      "query": {
+        "key": "<%= iparam.trelloApiKey %>"
+      }
+    }
+  },
+  "addNote": {
+    "schema": {
+      "protocol": "https",
+      "method": "POST",
+      "host": "<%= iparam.freshdeskDomain %>",
+      "path": "/api/v2/tickets/<%= context.ticketID %>/notes",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.freshdeskApiKey) %>"
+      }
+    }
+  },
+  "updateNote": {
+    "schema": {
+      "protocol": "https",
+      "method": "PUT",
+      "host": "<%= iparam.freshdeskDomain %>",
+      "path": "/api/v2/conversations/<%= context.noteId %>",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.freshdeskApiKey) %>"
+      }
+    }
+  },
+  "deleteNote": {
+    "schema": {
+      "protocol": "https",
+      "method": "DELETE",
+      "host": "<%= iparam.freshdeskDomain %>",
+      "path": "/api/v2/conversations/<%= context.noteId %>",
+      "headers": {
+        "Authorization": "Basic <%= encode(iparam.freshdeskApiKey) %>"
+      }
+    }
+  }
+}

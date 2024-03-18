@@ -92,9 +92,9 @@ exports = {
 
   getListSMI: async function (args) {
     try {
-      const iparam = args.iparams;
-      let url = `https://api.trello.com/1/boards/${iparam.trelloBoardId}/lists?key=${iparam.trelloApiKey}&token=${iparam.trelloToken}`;
-      let data = await $request.get(url);
+      let data = await $request.invokeTemplate("getListSMI", {
+        iparam: args.iparams
+      });
       let listData = JSON.parse(data.response);
       renderData(null, listData);
     }
@@ -107,9 +107,9 @@ exports = {
 
   getMemberSMI: async function (args) {
     try {
-      const iparam = args.iparams;
-      let url = `https://api.trello.com/1/boards/${iparam.trelloBoardId}/members?key=${iparam.trelloApiKey}&token=${iparam.trelloToken}`;
-      let data = await $request.get(url);
+      let data = await $request.invokeTemplate("getMemberSMI", {
+        iparam: args.iparams
+      });
       let memberData = JSON.parse(data.response);
       renderData(null, memberData);
     }
@@ -122,11 +122,12 @@ exports = {
 
   fetchCardSMI: async function (args) {
     try {
-      const iparam = args.iparams;
-      let url = `https://api.trello.com/1/cards/${args.cardID}?key=${iparam.trelloApiKey}&token=${iparam.trelloToken}&members=true&list=true&board=true`;;
-      let data = await $request.get(url);
-      data = JSON.parse(data.response);
-      renderData(null, data);
+      let data = await $request.invokeTemplate("fetchCardSMI", {
+        iparam: args.iparams,
+        context: {cardID: args.cardID}
+      });
+      let cardData = JSON.parse(data.response);
+      renderData(null, cardData);
     }
     catch (error) {
       console.error("Error while attempting to view Card");
@@ -137,11 +138,18 @@ exports = {
 
   postCardSMI: async function (args) {
     try {
-      const iparam = args.iparams;
-      let url = `https://api.trello.com/1/cards?key=${iparam.trelloApiKey}&token=${iparam.trelloToken}&idList=${args.idList}&idMembers=${args.idMembers}&name=${args.name}&desc=${args.desc}&due=${args.due}`;
-      let data = await $request.post(url);
-      data = JSON.parse(data.response);
-      renderData(null, data);
+      let data = await $request.invokeTemplate("postCardSMI", {
+        iparam: args.iparams,
+        context: {
+          idList: args.idList,
+          idMembers: args.idMembers,
+          name: args.name,
+          desc: args.desc,
+          due: args.due
+        }
+      });
+      let cardData = JSON.parse(data.response);
+      renderData(null, cardData);
     }
     catch (error) {
       console.error("Error while attempting to create Card");
@@ -152,9 +160,14 @@ exports = {
 
   postLabelSMI: async function (args) {
     try {
-      const iparam = args.iparams;
-      let url = `https://api.trello.com/1/cards/${args.cardId}/labels?key=${iparam.trelloApiKey}&token=${iparam.trelloToken}&name=${args.name}&color=${args.color}`;
-      let data = await $request.post(url);
+      let data = await $request.invokeTemplate("postLabelSMI", {
+        iparam: args.iparams,
+        context: {
+          cardId: args.cardId,
+          name: args.name,
+          color: args.color
+        }
+      });
       renderData(null, data);
     }
     catch (error) {
@@ -166,9 +179,12 @@ exports = {
 
   deleteCardSMI: async function (args) {
     try {
-      const iparam = args.iparams;
-      let url = `https://api.trello.com/1/cards/${args.cardID}?key=${iparam.trelloApiKey}&token=${iparam.trelloToken}`;
-      let data = await $request.delete(url);
+      let data = await $request.invokeTemplate("deleteCardSMI", {
+        iparam: args.iparams,
+        context: {
+          cardID: args.cardID
+        }
+      });
       renderData(null, data);
     }
     catch (error) {
@@ -176,118 +192,105 @@ exports = {
       console.error(error);
       renderData(error, null);
     }
-
   },
 
-  onInstallHandler: function (args) {
-    const iparam = args.iparams;
-    generateTargetUrl().then(function (targetUrl) {
-      let desc = "fd trello integration webhook";
-      $request.post(`https://api.trello.com/1/tokens/${iparam.trelloToken}/webhooks/?description=${desc}&callbackURL=${targetUrl}&idModel=${iparam.trelloBoardId}&key=${iparam.trelloApiKey}`)
-        .then(data => {
-          let jsonData = JSON.parse(data.response)
-          let webhookData = { webhookId: jsonData.id, url: jsonData.callbackURL };
-          setWebhookId(webhookData);
-        }, error => {
-          console.error('Error: Failed to register the webhook for trello');
-          console.error(error);
-          renderData({ message: 'The webhook registration failed' });
-        })
-    })
-      .catch(function () {
-        console.error('Error: Failed to generate the webhook');
-        renderData({ message: 'The webhook registration failed' });
+  onInstallHandler: async function (args) {
+    try {
+      const targetUrl = await generateTargetUrl();
+      const desc = "fd trello integration webhook";
+      const data = await $request.invokeTemplate("createWebhook", {
+        iparam: args.iparams,
+        context: {
+          desc: desc,
+          targetUrl: targetUrl
+        }
       });
+      let jsonData = JSON.parse(data.response);
+      let webhookData = { webhookId: jsonData.id, url: jsonData.callbackURL };
+      setWebhookId(webhookData);
+    } catch (error) {
+      console.error('Error: Failed to register the webhook for trello');
+      console.error(error);
+      renderData({ message: 'The webhook registration failed' });
+    }
   },
 
-  onUnInstallHandler: function (args) {
-    const iparam = args.iparams;
+  onUnInstallHandler: async function (args) {
     let dbkey = String(`trelloWebhook`).substring(0, 30);
-    $db.get(dbkey).then(function (data) {
-      $request.delete(`https://api.trello.com/1/tokens/${iparam.trelloToken}/webhooks/${data.webhook_data.webhookId}?key=${iparam.trelloApiKey}`)
-        .then(() => {
-          console.info('Successfully deregistered the webhook');
-          removeWebhookId();
-          renderData();
-        }, error => renderData({ error: error }));
-    }, error => {
+    try {
+      const data = await $db.get(dbkey);
+      await $request.invokeTemplate("deleteWebhook", {
+        iparam: args.iparams,
+        context: {
+          webhookId: data.webhook_data.webhookId
+        }
+      });
+      console.info('Successfully deregistered the webhook');
+      removeWebhookId();
+      renderData();
+    } catch (error) {
       console.error('Error: Failed to get the stored webhook URL from the db');
-      console.error(error)
+      console.error(error);
       renderData({ message: 'The webhook deregistration failed' });
-    })
+    }
   },
 
   // payload is a JSON block containing the payload information.
-  onExternalEventHandler: function (payloadData) {
+  onExternalEventHandler: async function (payloadData) {
     let payload = payloadData.data;
-    const iparam = payloadData.iparams;
-    let link = `https://trello.com/c/${payload.action.data.card.shortLink}`
+    let link = `https://trello.com/c/${payload.action.data.card.shortLink}`;
     if (payload.action.type === 'commentCard') {
-      lookupTicketId(payload.action.data.card.id).then(data => {
-        $request.post(`${iparam.freshdeskDomain}/api/v2/tickets/${data.card_data.ticketID}/notes`,
-          {
-            headers: {
-              Authorization: `Basic <%= encode(iparam.freshdeskApiKey) %>`
-            },
-            json: {
-              "body": `<p>username: ${payload.action.memberCreator.username}</p><p>comment: ${payload.action.data.text}</p><br><a href=${link} target="_blank" >view in trello</a>`,
-              "incoming": true
-            }
-          }).then((data) => {
-            console.info('Successfully added note in the Freshdesk ticket');
-            let noteData = { actionId: payload.action.id, noteId: data.response.id }
-            setNoteId(noteData);
-          }, error => {
-            console.error('Error: Failed to add note in  the Freshdesk ticket');
-            console.error(error)
-          })
-      }, error => {
+      try {
+        const data = await lookupTicketId(payload.action.data.card.id);
+        const body = `<p>username: ${payload.action.memberCreator.username}</p><p>comment: ${payload.action.data.text}</p><br><a href=${link} target="_blank" >view in trello</a>`;
+        const response = await $request.invokeTemplate("addNote", {
+          iparam: payloadData.iparams,
+          context: {
+            ticketID: data.card_data.ticketID,
+          },
+          body: JSON.stringify(body)
+        });
+        console.info('Successfully added note in the Freshdesk ticket');
+        let noteData = { actionId: payload.action.id, noteId: JSON.parse(response.response).id };
+        setNoteId(noteData);
+      } catch (error) {
         console.error('Error: Failed to get card data. Unable to create note');
         console.error(error);
-      });
-    }
-    else if (payload.action.type === 'updateComment') {
-      lookupNoteId(payload.action.data.action.id).then(data => {
-        $request.put(`${iparam.freshdeskDomain}/api/v2/conversations/${data.note_data.noteId}`,
-          {
-            headers: {
-              Authorization: `Basic <%= encode(iparam.freshdeskApiKey) %>`
-            },
-            json: {
-              "body": `<p>username: ${payload.action.memberCreator.username}</p><p>comment: ${payload.action.data.action.text}</p><br><a href=${link} target="_blank" >view in trello</a>`,
-            }
-          }).then(() => {
-            console.info('Successfully updated note in the Freshdesk ticket');
-          }, error => {
-            console.error('Error: Failed to update note in  the Freshdesk ticket');
-            console.error(error)
-          })
-      }, error => {
+      }
+    } else if (payload.action.type === 'updateComment') {
+      try {
+        const data = await lookupNoteId(payload.action.data.action.id);
+        const body = `<p>username: ${payload.action.memberCreator.username}</p><p>comment: ${payload.action.data.action.text}</p><br><a href=${link} target="_blank" >view in trello</a>`;
+        await $request.invokeTemplate("updateNote", {
+          iparam: payloadData.iparams,
+          context: {
+            noteId: data.note_data.noteId
+          },
+          body: JSON.stringify(body)
+        });
+        console.info('Successfully updated note in the Freshdesk ticket');
+      } catch (error) {
         console.error('Error: Failed to get note data. Unable to update note');
         console.error(error);
-      });
-    }
-    else if (payload.action.type === 'deleteComment') {
-      lookupNoteId(payload.action.data.action.id).then(data => {
-        $request.delete(`${iparam.freshdeskDomain}/api/v2/conversations/${data.note_data.noteId}`,
-          {
-            headers: {
-              Authorization: `Basic <%= encode(iparam.freshdeskApiKey) %>`
-            }
-          }).then(() => {
-            console.info('Successfully deleted note in the Freshdesk ticket');
-            removeData(payload.action.data.action.id);
-          }, error => {
-            console.error('Error: Failed to delete note in  the Freshdesk ticket');
-            console.error(error)
-          })
-      }, error => {
+      }
+    }else if (payload.action.type === 'deleteComment') {
+      try {
+        const data = await lookupNoteId(payload.action.data.action.id);
+        await $request.invokeTemplate("deleteNote", {
+          iparam: payloadData.iparams,
+          context: {
+            noteId: data.note_data.noteId
+          }
+        });
+        console.info('Successfully deleted note in the Freshdesk ticket');
+        removeData(payload.action.data.action.id);
+      } catch (error) {
         console.error('Error: Failed to get note data. Unable to delete note');
         console.error(error);
-      });
-    }
-    else {
+      }
+    } else {
       console.info("This action of the trello card is not defined in app's use case");
     }
   }
 };
+
