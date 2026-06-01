@@ -1,62 +1,48 @@
-# trello-freshdesk-integrator
-Freshdesk - Trello Integration App
+# Trello–Freshdesk integrator
 
-## Description
+Freshdesk ticket-sidebar app that links support tickets to **Trello** cards so agents and engineering can collaborate in one workflow. Create a Trello card from a ticket, keep card metadata in key-value storage, and sync Trello board comments back to the ticket as private notes.
 
-This app improves customer support experience enabling an agent to collaborate easily by creating helpdesk tickets and connecting Trello boards to the Freshdesk help desk platform, improving issue resolution. The agent can now create new Trello cards directly from your Support tickets, from scratch! 
+## Real-world use case
 
-***
+Support teams often track escalations in Trello while agents work in Freshdesk. This sample shows a practical pattern: **create cards from tickets**, register a Trello webhook on install, and **mirror card comments** to Freshdesk notes so agents see engineering updates without leaving the helpdesk.
 
-## Screenshots
+## Features
 
-<img src="./screenshots/ticket-sidebar.png" width="300">
-<p float="left">
-  <img src="./screenshots/create-card.jpeg" width="400" />
-  <img src="./screenshots/view-card.jpeg" width="400" /> 
-</p>
-<img src="./screenshots/app-preview.png">
-
-***
-
-## Features Demonstrated
-
-Product: Freshdesk
-App location: ticket_sidebar on Ticket Details Page
-
-| Feature | Notes |
-| :---: | --- |
-| [`Installation Parameters`](https://developers.freshdesk.com/v2/docs/installation-parameters) | Installation parameters used to let admins configure account _domain_, _api keys_, _token_ and _board id_  |
-| [`Data Method`](https://developers.freshdesk.com/v2/docs/data-methods) | Data Method is used to retrieve _Ticket Details_ |
-| [`Interface Method`](https://developers.freshdesk.com/v2/docs/interface-methods) | Interface Method is used to trigger modals and  to show notifications to the user  |
-| [`Request Method`](https://developers.freshdesk.com/v2/docs/request-method) | Request Method has been used to make secure API calls to the third party domain (Trello) |
-| [`Instance Method`](https://developers.freshdesk.com/v2/docs/instance-method) | Instance method is used to communicate between instances|
-| [`Key-Value Storage`](https://developers.freshdesk.com/v2/docs/key-value-storage) | Data storage is used to store info about linked cards , notes|
-| [`External events`](https://developers.freshdesk.com/v2/docs/external-events) | External event is used to register,deregister the webhook and listen to events from trello board|
-| [`Server Method Invocation`](https://developers.freshdesk.com/v2/docs/server-method-invocation) | SMI is used to used to facilitate Request Method calls|
+- Ticket sidebar UI to create, view, and delete linked Trello cards
+- Serverless handlers for Trello API calls (lists, members, cards, labels)
+- Webhook registration on app install; cleanup on uninstall
+- External events: Trello comment create/update/delete → Freshdesk notes
+- Key-value storage for card↔ticket and comment↔note mappings
 
 ## Prerequisites
 
-1. Make sure you have a trial Freshdesk account created
-2. A properly configured [Development environment](https://developers.freshdesk.com/v2/docs/quick-start/) along with the [FDK (Freshworks Development Kit)](https://developers.freshdesk.com/v2/docs/freshworks-cli/).
-3. A trello account with a Workspace board.
+- Freshdesk trial or dev account
+- [FDK 10.x](https://developers.freshworks.com/docs/app-sdk/v3.0/) on **Node.js 24.x**
+- Trello account, board ID, API key, and token ([Trello app key page](https://trello.com/app-key))
 
-***
+## Installation parameters
 
-## Procedure to run the app
+| Parameter | Description |
+|-----------|-------------|
+| `trelloBoardId` | Board to attach cards and webhooks |
+| `trelloApiKey` / `trelloToken` | Trello API credentials |
+| `freshdeskDomain` | Freshdesk domain host (e.g. `yourdomain.freshdesk.com`) |
+| `freshdeskApiKey` | Freshdesk API key (Profile settings) |
 
-1. Run the app locally using the [`fdk run`](https://developers.freshdesk.com/v2/docs/freshworks-cli/#run) command.
-2. Go to `http://localhost:10001/custom_configs` in your browser to set up your trello API key, Board id, Token  and freshdesk API key , domain.
-3. Go to Freshdesk, navigate to the tickets page and select any ticket
-4. Refer to the [Test the app](https://developers.freshdesk.com/v2/docs/quick-start/#test_your_app) section of the quickstart guide to allow insecure content.
-5. Append `?dev=true` to the URL to see the changes
+## Setup and testing
 
-***
+1. From this app folder, run `fdk validate` then `fdk run`.
+2. Open `http://localhost:10001/custom_configs` and enter iparams.
+3. In Freshdesk, open a ticket and load the app sidebar (`?dev=true` locally if needed).
+4. Create a Trello card from the ticket; add a comment on the card in Trello and confirm a note appears on the ticket.
 
-## Additional Notes
+## Project structure
 
-- you can get the API key of Freshdesk in following way
-  - Log in to your support portal.
-  - Click on your profile picture on the top right corner of your portal.
-  - Go to Profile settings Page
-  - Your API key will be available on the right side above sort conversations.
-- you can get the API key and Token of Trello here - https://trello.com/app-key
+- `manifest.json` — Platform 3.0 modules (`support_ticket` sidebar + common events/SMI)
+- `app/` — Ticket sidebar UI and modals
+- `config/requests.json` — Trello and Freshdesk request templates
+- `server/server.js` — SMI, install/uninstall, and external-event handlers
+
+## License
+
+See repository defaults.

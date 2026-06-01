@@ -32,6 +32,8 @@ function select(selector) {
   return document.querySelector(selector);
 }
 
+// Referenced from createModal.html onclick handlers
+// eslint-disable-next-line no-unused-vars
 function addList() {
   let id = document.getElementById('idList');
   idlist.forEach(obj => {
@@ -44,6 +46,7 @@ function addList() {
   });
 }
 
+// eslint-disable-next-line no-unused-vars
 function addMembers() {
   let id = document.getElementById('members');
   idmember.forEach(obj => {
@@ -57,6 +60,7 @@ function addMembers() {
 }
 
 
+// eslint-disable-next-line no-unused-vars
 async function createLink() {
   let sub = select('#title').value;
   let desc = select('#desc').value;

@@ -1,13 +1,11 @@
 {
-  "platform-version": "2.3",
-  "product": {
-    "freshdesk": {
-      "location": {
-        "ticket_sidebar": {
-          "url": "template.html",
-          "icon": "trello.svg"
-        }
-      },
+  "platform-version": "3.0",
+  "app": {
+    "tracking_id": "t4r3l0fdk1nt3gr4t0r01",
+    "start_time": "2026-06-01T00:00:00.000Z"
+  },
+  "modules": {
+    "common": {
       "events": {
         "onAppInstall": {
           "handler": "onInstallHandler"
@@ -48,13 +46,22 @@
         "deleteCardSMI": {},
         "createWebhook": {},
         "deleteWebhook": {},
+        "addNote": {},
         "updateNote": {},
         "deleteNote": {}
+      }
+    },
+    "support_ticket": {
+      "location": {
+        "ticket_sidebar": {
+          "url": "template.html",
+          "icon": "trello.svg"
+        }
       }
     }
   },
   "engines": {
-    "node": "18.17.0",
-    "fdk": "9.1.0"
+    "node": "24.11.0",
+    "fdk": "10.1.2"
   }
 }

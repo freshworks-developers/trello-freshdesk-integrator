@@ -185,6 +185,8 @@ async function fetchCard(cardID) {
     };
 }
 
+// Referenced from viewModal.js modal HTML onclick
+// eslint-disable-next-line no-unused-vars
 async function back() {
   await client.instance.close();
 }
